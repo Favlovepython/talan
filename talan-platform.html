@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Талан — образовательная платформа</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F8F9FB; --surface:#FFFFFF; --accent:#2563EB; --accent-soft:#EFF4FF;
+  --text:#111827; --muted:#6B7280; --line:#E5E7EB;
+  --ok:#16A34A; --ok-soft:#ECFDF3; --err:#DC2626; --err-soft:#FEF2F2;
+  --warn:#D97706; --warn-soft:#FFFBEB;
+  --r:14px; --r-lg:20px;
+  --sh:0 1px 2px rgba(16,24,40,.05), 0 4px 16px rgba(16,24,40,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;font-size:14px;line-height:1.5}
+button,input,select,textarea{font:inherit;color:inherit}
+h1{font-size:22px;font-weight:700;letter-spacing:-.02em}
+h2{font-size:16px;font-weight:600;letter-spacing:-.01em}
+h3{font-size:14px;font-weight:600}
+.muted{color:var(--muted)}
+.hidden{display:none !important}
+
+/* ---------- LOGIN ---------- */
+#login{min-height:100vh;display:grid;place-items:center;padding:24px;background:
+  radial-gradient(1200px 600px at 50% -10%, #EEF4FF 0%, var(--bg) 60%)}
+.login-card{width:100%;max-width:380px;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--r-lg);padding:32px;box-shadow:var(--sh)}
+.logo{display:flex;align-items:center;gap:10px;margin-bottom:22px}
+.logo-mark{width:34px;height:34px;border-radius:10px;background:var(--accent);color:#fff;
+  display:grid;place-items:center;font-weight:700;font-size:15px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:6px}
+.input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;outline:none;transition:.15s}
+.input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 16px;
+  border:1px solid transparent;border-radius:10px;background:var(--accent);color:#fff;
+  font-weight:600;cursor:pointer;transition:.15s;min-height:40px}
+.btn:hover{filter:brightness(1.06)}
+.btn:active{transform:translateY(1px)}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn-block{width:100%}
+.btn-ghost{background:transparent;color:var(--text);border-color:var(--line)}
+.btn-ghost:hover{background:var(--bg);filter:none}
+.btn-danger{background:var(--err)}
+.btn-sm{padding:6px 10px;min-height:32px;font-size:13px;font-weight:500}
+.hint{margin-top:16px;padding:12px;background:var(--accent-soft);border-radius:10px;font-size:12px;color:#1E40AF;line-height:1.6}
+.hint code{background:#fff;padding:1px 5px;border-radius:4px;font-size:11px}
+.err-msg{color:var(--err);font-size:12px;margin-top:8px;min-height:16px}
+
+/* ---------- APP SHELL ---------- */
+#app{display:none;min-height:100vh}
+.shell{display:flex;min-height:100vh}
+.sidebar{width:236px;flex:0 0 236px;background:var(--surface);border-right:1px solid var(--line);
+  padding:18px 12px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh}
+.sidebar .logo{padding:0 8px;margin-bottom:18px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;
+  color:var(--muted);font-weight:500;cursor:pointer;border:none;background:none;width:100%;text-align:left;transition:.12s}
+.nav-item:hover{background:var(--bg);color:var(--text)}
+.nav-item.active{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.nav-item svg{width:18px;height:18px;flex:0 0 18px;stroke-width:1.8}
+.side-user{display:none;align-items:center;gap:10px;margin-top:auto;padding:10px 8px;
+  border-top:1px solid var(--line)}
+.side-user .who-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.header{background:var(--surface);border-bottom:1px solid var(--line);padding:12px 24px;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;position:sticky;top:0;z-index:20}
+.who{display:flex;align-items:center;gap:10px}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--accent-soft);color:var(--accent);
+  display:grid;place-items:center;font-weight:600;font-size:12px}
+.who-name{font-weight:600;font-size:13px;line-height:1.3}
+.who-role{font-size:11px;color:var(--muted)}
+.page{padding:24px;flex:1;max-width:1200px;width:100%}
+.page-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+
+/* ---------- CARDS / TABLES ---------- */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--sh)}
+.card-pad{padding:18px}
+.grid{display:grid;gap:14px}
+.cols-2{grid-template-columns:1.4fr 1fr}
+.stats{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+.stat .label{font-size:12px;color:var(--muted);font-weight:500}
+.stat .value{font-size:28px;font-weight:700;letter-spacing:-.03em;margin-top:6px}
+.stat .sub{font-size:11px;color:var(--muted);margin-top:4px}
+.live{display:inline-flex;align-items:center;gap:6px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--ok);animation:pulse 1.6s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.04em;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:var(--bg)}
+.table-wrap{overflow-x:auto;border-radius:var(--r-lg)}
+.badge{display:inline-block;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:600}
+.badge-ok{background:var(--ok-soft);color:var(--ok)}
+.badge-err{background:var(--err-soft);color:var(--err)}
+.badge-warn{background:var(--warn-soft);color:var(--warn)}
+.badge-blue{background:var(--accent-soft);color:var(--accent)}
+.badge-gray{background:var(--bg);color:var(--muted)}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.select{padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer;outline:none}
+.select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.empty{padding:44px 20px;text-align:center;color:var(--muted)}
+.empty strong{display:block;color:var(--text);margin-bottom:4px}
+code.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;background:var(--bg);
+  padding:2px 6px;border-radius:5px;border:1px solid var(--line)}
+
+/* ---------- MODAL ---------- */
+.modal-bg{position:fixed;inset:0;background:rgba(17,24,39,.45);display:grid;place-items:center;
+  padding:20px;z-index:100;overflow-y:auto}
+.modal{background:var(--surface);border-radius:var(--r-lg);width:100%;max-width:520px;box-shadow:0 20px 50px rgba(16,24,40,.2);margin:auto}
+.modal-head{padding:18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.modal-body{padding:18px;max-height:65vh;overflow-y:auto}
+.modal-foot{padding:14px 18px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end}
+.x{background:none;border:none;cursor:pointer;color:var(--muted);font-size:20px;line-height:1;padding:4px 8px;border-radius:8px}
+.x:hover{background:var(--bg);color:var(--text)}
+.check-list{max-height:260px;overflow-y:auto;border:1px solid var(--line);border-radius:10px}
+.check-row{display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid var(--line);cursor:pointer}
+.check-row:last-child{border-bottom:none}
+.check-row:hover{background:var(--bg)}
+.check-row input{width:16px;height:16px;accent-color:var(--accent);cursor:pointer}
+
+/* ---------- TEST RUNNER ---------- */
+.timer-bar{position:sticky;top:0;z-index:30;background:var(--surface);border-bottom:1px solid var(--line);
+  padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.timer{font-variant-numeric:tabular-nums;font-weight:700;font-size:17px;letter-spacing:-.02em}
+.timer.low{color:var(--err)}
+.progress{height:4px;background:var(--line);border-radius:999px;overflow:hidden;flex:1;max-width:240px}
+.progress i{display:block;height:100%;background:var(--accent);transition:width .25s;border-radius:999px}
+.q-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:20px;box-shadow:var(--sh)}
+.q-text{font-size:16px;font-weight:500;line-height:1.55;margin:10px 0 18px}
+.opt{display:flex;align-items:center;gap:12px;padding:14px;border:1.5px solid var(--line);border-radius:12px;
+  cursor:pointer;margin-bottom:9px;min-height:52px;transition:.12s;background:#fff}
+.opt:hover{border-color:#C7D2FE;background:var(--accent-soft)}
+.opt.sel{border-color:var(--accent);background:var(--accent-soft)}
+.opt.right{border-color:var(--ok);background:var(--ok-soft)}
+.opt.wrong{border-color:var(--err);background:var(--err-soft)}
+.opt-key{width:26px;height:26px;flex:0 0 26px;border-radius:7px;background:var(--bg);display:grid;place-items:center;
+  font-weight:600;font-size:12px;border:1px solid var(--line)}
+.opt.sel .opt-key{background:var(--accent);color:#fff;border-color:var(--accent)}
+.opt.right .opt-key{background:var(--ok);color:#fff;border-color:var(--ok)}
+.opt.wrong .opt-key{background:var(--err);color:#fff;border-color:var(--err)}
+.qmap{display:flex;flex-wrap:wrap;gap:6px}
+.qmap button{width:32px;height:32px;border-radius:8px;border:1px solid var(--line);background:#fff;
+  font-size:12px;font-weight:600;cursor:pointer;color:var(--muted)}
+.qmap button.done{background:var(--accent-soft);border-color:#C7D2FE;color:var(--accent)}
+.qmap button.cur{background:var(--accent);border-color:var(--accent);color:#fff}
+.runner-nav{display:flex;gap:8px;justify-content:space-between;margin-top:16px}
+
+/* ---------- CHARTS ---------- */
+.bars{display:flex;align-items:flex-end;gap:10px;height:150px;padding-top:8px}
+.bars .b{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+.bars .b i{width:100%;max-width:44px;background:var(--accent);border-radius:6px 6px 0 0;min-height:3px;transition:height .4s}
+.bars .b span{font-size:10px;color:var(--muted);white-space:nowrap}
+.bars .b b{font-size:11px;font-weight:600}
+
+/* ---------- TOAST ---------- */
+#toasts{position:fixed;bottom:20px;right:20px;z-index:200;display:flex;flex-direction:column;gap:8px}
+.toast{background:var(--text);color:#fff;padding:11px 16px;border-radius:10px;font-size:13px;font-weight:500;
+  box-shadow:0 8px 24px rgba(0,0,0,.2);animation:up .25s ease}
+@keyframes up{from{opacity:0;transform:translateY(8px)}}
+
+/* ---------- MOBILE ---------- */
+.burger{display:none;background:none;border:1px solid var(--line);border-radius:8px;padding:7px 9px;cursor:pointer;line-height:1}
+.scrim{display:none}
+
+/* --- ПЛАНШЕТ: колонки в один столбец, сайдбар уже --- */
+@media (max-width:1024px){
+  .cols-2{grid-template-columns:1fr}
+  .sidebar{width:200px;flex-basis:200px}
+  .page{padding:20px}
+}
+
+/* --- ТЕЛЕФОН: сайдбар выезжает, таблицы становятся карточками --- */
+@media (max-width:860px){
+  .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:60;width:250px;flex-basis:250px;
+    transform:translateX(-100%);transition:transform .22s;height:100vh;overflow-y:auto}
+  .sidebar.open{transform:none;box-shadow:0 0 60px rgba(0,0,0,.25)}
+  .burger{display:block}
+  .scrim{display:block;position:fixed;inset:0;background:rgba(17,24,39,.4);z-index:55}
+  .page{padding:14px}
+  .header{padding:10px 12px;gap:8px}
+  h1{font-size:19px}
+  .stats{grid-template-columns:1fr 1fr;gap:10px}
+  .stat .value{font-size:22px}
+  .card-pad{padding:14px}
+  .page-head{gap:10px}
+  .page-head .btn{flex:1}
+
+  /* в шапке имя не помещается — оно уезжает в боковое меню */
+  .header .who-name,.header .who-role{display:none}
+  .who{gap:6px}
+  .side-user{display:flex}
+
+  /* ТАБЛИЦЫ → КАРТОЧКИ: каждая строка становится отдельным блоком */
+  table.stack thead{display:none}
+  table.stack tbody tr{display:block;background:var(--surface);border:1px solid var(--line);
+    border-radius:12px;padding:10px 12px;margin-bottom:8px}
+  table.stack tbody tr:hover{background:var(--surface)}
+  table.stack td{display:flex;justify-content:space-between;align-items:center;gap:12px;
+    padding:5px 0;border:none;text-align:right}
+  table.stack td:before{content:attr(data-l);color:var(--muted);font-size:11px;font-weight:600;
+    text-transform:uppercase;letter-spacing:.04em;text-align:left;flex:0 0 auto}
+  table.stack td:empty{display:none}
+  table.stack td[data-l=""]{justify-content:flex-end;padding-top:8px;border-top:1px solid var(--line);margin-top:4px}
+  table.stack td[data-l=""]:before{display:none}
+  /* карточка-обёртка убирается: строки сами стали карточками.
+     :has() не работает в старых Safari — дублируем классом .card-stack */
+  .card:has(table.stack),.card-stack{border:none;background:none;box-shadow:none;border-radius:0}
+  .table-wrap{overflow-x:visible}
+
+  /* ТЕСТ: крупные зоны нажатия, таймер всегда виден */
+  .timer-bar{padding:8px 12px}
+  .timer-bar .progress{max-width:none}
+  .q-text{font-size:15px}
+  .opt{padding:15px 13px;min-height:56px}
+  .runner-nav .btn{flex:1;min-height:46px}
+  .qmap button{width:38px;height:38px}
+  .modal-foot .btn{flex:1}
+  .modal-body{max-height:60vh}
+  #toasts{left:14px;right:14px;bottom:14px}
+  .toast{text-align:center}
+}
+
+/* --- УЗКИЙ ТЕЛЕФОН --- */
+@media (max-width:400px){
+  .login-card{padding:22px}
+  .stats{grid-template-columns:1fr}
+  .page-head{flex-direction:column;align-items:stretch}
+  .toolbar .input,.toolbar .select{width:100%;max-width:none}
+}
+</style>
+</head>
+<body>
+<div id="login"></div>
+<div id="app"></div>
+<div id="modal-root"></div>
+<div id="toasts"></div>
+<script>
+/* ============================================================
+   ТАЛАН — прототип. Все данные живут в памяти (объект DB).
+   Перезагрузка страницы = сброс к демо-данным.
+   ============================================================ */
+
+const T = { /* тексты — вынесены отдельно, чтобы позже добавить каз/англ */
+  app:'Талан', tagline:'Образовательный центр',
+  nav:{dash:'Дашборд',students:'Ученики',groups:'Группы',block:'Блочные тесты',ent:'ЕНТ',
+       reports:'Отчёты',questions:'База вопросов',admins:'Администраторы',audit:'Журнал действий',
+       myTests:'Мои тесты',myResults:'Мои результаты'},
+  login:{title:'Вход в систему',user:'Логин',pass:'Пароль',go:'Войти',bad:'Неверный логин или пароль'},
+  exit:'Выйти', allBranches:'Все филиалы'
+};
+
+const SUBJECTS = [
+  {id:'hist',   name:'История Казахстана', kind:'req',  q:20},
+  {id:'read',   name:'Грамотность чтения', kind:'req',  q:10},
+  {id:'mathlit',name:'Математическая грамотность', kind:'req', q:10},
+  {id:'math',   name:'Математика',   kind:'prof', q:40},
+  {id:'phys',   name:'Физика',       kind:'prof', q:40},
+  {id:'chem',   name:'Химия',        kind:'prof', q:40},
+  {id:'bio',    name:'Биология',     kind:'prof', q:40},
+  {id:'geo',    name:'География',    kind:'prof', q:40},
+  {id:'inf',    name:'Информатика',  kind:'prof', q:40},
+  {id:'world',  name:'Всемирная история', kind:'prof', q:40},
+  {id:'law',    name:'Основы права', kind:'prof', q:40}
+];
+const subjName = id => (SUBJECTS.find(s=>s.id===id)||{}).name || id;
+
+const DB = {
+  branches:[
+    {id:1,name:'Туран'},{id:2,name:'Сарыарка'},{id:3,name:'Алматы'},{id:4,name:'Шымкент'}
+  ],
+  admins:[
+    {id:1,login:'super',   pass:'super',  name:'Айгерим Нурланова', role:'super', branchId:null, allBranches:true},
+    {id:2,login:'admin',   pass:'admin',  name:'Данияр Ахметов',    role:'admin', branchId:1,    allBranches:false},
+    {id:3,login:'manager', pass:'manager',name:'Асель Сериккызы',   role:'admin', branchId:null, allBranches:true}
+  ],
+  groups:[
+    {id:1,name:'I1-Туран',   branchId:1, curatorId:2, profiles:['math','phys']},
+    {id:2,name:'I2-Туран',   branchId:1, curatorId:2, profiles:['bio','chem']},
+    {id:3,name:'S1-Сарыарка',branchId:2, curatorId:3, profiles:['inf','math']}
+  ],
+  students:[], attempts:[], audit:[], tests:[], questions:[],
+  seq:{student:0,test:1,attempt:1,audit:1,group:4,admin:4,q:1}
+};
+
+/* ---------- генерация логина/пароля ---------- */
+const TRANSLIT = {а:'a',б:'b',в:'v',г:'g',д:'d',е:'e',ё:'e',ж:'zh',з:'z',и:'i',й:'y',к:'k',л:'l',м:'m',
+  н:'n',о:'o',п:'p',р:'r',с:'s',т:'t',у:'u',ф:'f',х:'h',ц:'c',ч:'ch',ш:'sh',щ:'sch',ъ:'',ы:'y',ь:'',
+  э:'e',ю:'yu',я:'ya',қ:'q',ғ:'g',ң:'n',ө:'o',ұ:'u',ү:'u',һ:'h',і:'i',ә:'a'};
+const translit = s => s.toLowerCase().split('').map(c=>TRANSLIT[c] ?? (/[a-z0-9]/.test(c)?c:'')).join('');
+
+function makeLogin(fio){
+  const [last='',first=''] = fio.trim().split(/\s+/);
+  const base = translit(last) + '_' + translit(first).charAt(0);
+  let n = 1;
+  while(DB.students.some(s=>s.login === base+n)) n++;
+  return base+n;
+}
+// без визуально похожих символов: без 0/O, l/1/I
+const PASS_CHARS = 'abcdefghjkmnpqrstuvwxyz23456789';
+const makePass = () => Array.from({length:7},()=>PASS_CHARS[Math.floor(Math.random()*PASS_CHARS.length)]).join('');
+
+/* ---------- банк вопросов (демо: 3 предмета × темы × 10 вопросов) ---------- */
+const TOPICS = {
+  inf:['Системы счисления','Логические операции','Алгоритмы','Циклы','Массивы','Базы данных','Сети','HTML и CSS'],
+  math:['Уравнения','Неравенства','Функции','Производная','Прогрессии','Векторы','Тригонометрия','Логарифмы'],
+  phys:['Кинематика','Динамика','Законы сохранения','Термодинамика','Электростатика','Ток','Оптика','Атом'],
+  bio:['Клетка','Ткани','Генетика','Эволюция','Экология','Ботаника','Зоология','Человек'],
+  chem:['Атом','Связи','Растворы','Кислоты','Металлы','Неметаллы','Органика','Реакции'],
+  hist:['Древний Казахстан','Средневековье','Ханство','Колониальный период','ХХ век','Независимость'],
+  read:['Работа с текстом','Анализ информации','Выводы'],
+  mathlit:['Проценты','Графики и таблицы','Практические задачи'],
+  geo:['Картография','Литосфера','Атмосфера','Гидросфера','Население','Экономика'],
+  world:['Древний мир','Средние века','Новое время','Новейшее время'],
+  law:['Основы права','Конституция','Гражданское право','Уголовное право']
+};
+function seedQuestions(){
+  for(const [subj, topics] of Object.entries(TOPICS)){
+    topics.forEach(topic=>{
+      const plan = [['A',4],['B',4],['C',2]];
+      plan.forEach(([lvl,cnt])=>{
+        for(let i=1;i<=cnt;i++){
+          const correct = Math.floor(Math.random()*4);
+          DB.questions.push({
+            id: DB.seq.q++, subject:subj, topic, level:lvl,
+            text:`[${subjName(subj)} · ${topic} · уровень ${lvl}] Демонстрационный вопрос №${i}. В реальной системе здесь будет текст задания, загруженный из Excel-шаблона.`,
+            options:[0,1,2,3].map(k=>`Вариант ответа ${'АБВГ'[k]}${k===correct?' (верный)':''}`),
+            correct
+          });
+        }
+      });
+    });
+  }
+}
+
+/* ---------- ученики ---------- */
+const FIRST=['Айдана','Ерасыл','Аружан','Данияр','Алина','Нурлан','Камила','Ислам','Дана','Тимур',
+  'Мадина','Алишер','Асель','Санжар','Диана','Алихан','Жанель','Бекзат','Аяжан','Арман'];
+const LAST=['Абдуллаев','Серикова','Нурланов','Жумабек','Касымова','Оспанов','Ахметова','Байжанов',
+  'Сагындык','Турсынова','Мукашев','Ералиева','Досжан','Кайратова','Смагулов'];
+
+function addStudent(fio, branchId, groupId){
+  const st = {id:++DB.seq.student, fio, branchId, groupId,
+    login:makeLogin(fio), pass:makePass(), created:new Date(), status:'active'};
+  DB.students.push(st);
+  return st;
+}
+function seedStudents(){
+  DB.groups.forEach(g=>{
+    const n = 10 + Math.floor(Math.random()*4);
+    for(let i=0;i<n;i++){
+      const fio = LAST[Math.floor(Math.random()*LAST.length)]+' '+FIRST[Math.floor(Math.random()*FIRST.length)];
+      addStudent(fio, g.branchId, g.id);
+    }
+  });
+  for(let i=0;i<5;i++){ // без группы
+    const fio = LAST[Math.floor(Math.random()*LAST.length)]+' '+FIRST[Math.floor(Math.random()*FIRST.length)];
+    addStudent(fio, 1+Math.floor(Math.random()*4), null);
+  }
+}
+
+/* ---------- тесты ---------- */
+function pickForTopic(subject, topic){
+  const pool = lvl => DB.questions.filter(q=>q.subject===subject&&q.topic===topic&&q.level===lvl);
+  const take = (arr,n) => [...arr].sort(()=>Math.random()-.5).slice(0,n);
+  return [...take(pool('A'),2), ...take(pool('B'),2), ...take(pool('C'),1)]; // 2А+2Б+1С = 5
+}
+function buildVariant(test){ // индивидуальный вариант на ученика
+  let qs = [];
+  if(test.type==='block'){
+    test.topics.forEach(t => qs.push(...pickForTopic(test.subject, t)));
+  } else {
+    test.entSubjects.forEach(({subject,count})=>{
+      const pool = DB.questions.filter(q=>q.subject===subject);
+      if(!pool.length) return; // нет вопросов по предмету — блок пропускается
+      for(let i=0;i<count;i++) qs.push(pool[i % pool.length]);
+    });
+  }
+  if(test.type==='block') qs.sort(()=>Math.random()-.5);
+  return qs.map(q=>{
+    const order = [0,1,2,3].sort(()=>Math.random()-.5); // перемешиваем варианты ответа
+    return {qid:q.id, order, correctPos:order.indexOf(q.correct)};
+  });
+}
+function seedTests(){
+  DB.tests.push({
+    id:DB.seq.test++, type:'block', title:'Информатика — блок 1', subject:'inf',
+    topics:['Системы счисления','Логические операции','Алгоритмы','Циклы'],
+    groupIds:[1,3], minutes:40, attemptsAllowed:2, deadline:addDays(new Date(),5), created:new Date()
+  });
+  DB.tests.push({
+    id:DB.seq.test++, type:'block', title:'Биология — клетка и генетика', subject:'bio',
+    topics:['Клетка','Генетика','Ткани'],
+    groupIds:[2], minutes:30, attemptsAllowed:1, deadline:addDays(new Date(),3), created:new Date()
+  });
+  DB.tests.push({
+    id:DB.seq.test++, type:'ent', title:'Пробное ЕНТ — вариант №1', variantNo:1,
+    groupIds:[1,2,3], minutes:240, attemptsAllowed:1, deadline:addDays(new Date(),7), created:new Date(),
+    entSubjects:[] // заполняется при старте по профилям группы
+  });
+}
+const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+
+/* ---------- прошлые попытки (для отчётов) ---------- */
+function seedAttempts(){
+  DB.tests.filter(t=>t.type==='block').forEach(test=>{
+    DB.students.filter(s=>test.groupIds.includes(s.groupId)).forEach(s=>{
+      if(Math.random()<0.25) return; // кто-то не сдал — нужно для «процента выполнения»
+      const total = test.topics.length*5;
+      const correct = Math.round(total*(0.35+Math.random()*0.6));
+      const byTopic = {};
+      test.topics.forEach(t=>byTopic[t]={ok:0,total:5});
+      let left = Math.min(correct,total);
+      test.topics.forEach(t=>{const g=Math.min(5,Math.max(0,Math.round(left/test.topics.length + (Math.random()*2-1))));byTopic[t].ok=g;left-=g;});
+      DB.attempts.push({
+        id:DB.seq.attempt++, testId:test.id, studentId:s.id, finished:true,
+        score:Math.min(correct,total), total, byTopic,
+        started:addDays(new Date(),-Math.floor(Math.random()*14)), tabSwitches:Math.random()<0.2?1+Math.floor(Math.random()*3):0
+      });
+    });
+  });
+}
+
+function log(action, details){
+  DB.audit.unshift({id:DB.seq.audit++, who:S.user?S.user.name:'—', role:S.user?S.user.role:'—',
+    action, details, at:new Date()});
+}
+
+/* ---------- состояние сессии ---------- */
+const S = {user:null, page:'dash', branchFilter:'all', run:null, sidebarOpen:false};
+
+function seed(){ seedQuestions(); seedStudents(); seedTests(); seedAttempts(); }
+seed();
+
+/* ---------- права доступа (фильтрация «как на бэкенде») ---------- */
+function visibleBranchIds(){
+  if(!S.user) return [];
+  if(S.user.role==='super' || S.user.allBranches) return DB.branches.map(b=>b.id);
+  return [S.user.branchId];
+}
+function scopedBranchIds(){ // с учётом переключателя филиалов
+  const vis = visibleBranchIds();
+  if(S.branchFilter==='all') return vis;
+  const id = +S.branchFilter;
+  return vis.includes(id) ? [id] : vis;
+}
+const scopedStudents = () => DB.students.filter(s=>scopedBranchIds().includes(s.branchId));
+const scopedGroups   = () => DB.groups.filter(g=>scopedBranchIds().includes(g.branchId));
+const scopedTests    = () => DB.tests.filter(t=>t.groupIds.some(gid=>{
+  const g=DB.groups.find(x=>x.id===gid); return g && scopedBranchIds().includes(g.branchId);
+}));
+
+/* ---------- утилиты ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmtDate = d => new Date(d).toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric'});
+const fmtTime = d => new Date(d).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+const branchName = id => (DB.branches.find(b=>b.id===id)||{}).name || '—';
+const groupName  = id => (DB.groups.find(g=>g.id===id)||{}).name || 'Без группы';
+const initials = n => n.split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+const pct = (a,b) => b ? Math.round(a/b*100) : 0;
+
+function toast(msg){
+  const el = document.createElement('div');
+  el.className='toast'; el.textContent=msg;
+  $('#toasts').appendChild(el);
+  setTimeout(()=>el.remove(), 2600);
+}
+
+/* ============================================================
+   ЭКРАН ВХОДА
+   ============================================================ */
+function renderLogin(){
+  $('#login').innerHTML = `
+    <form class="login-card" id="login-form">
+      <div class="logo"><div class="logo-mark">Т</div>
+        <div><div style="font-weight:700;letter-spacing:-.02em">${T.app}</div>
+        <div class="muted" style="font-size:11px">${T.tagline}</div></div></div>
+      <h1 style="font-size:18px;margin-bottom:16px">${T.login.title}</h1>
+      <div class="field"><label for="lg">${T.login.user}</label>
+        <input class="input" id="lg" autocomplete="username" required></div>
+      <div class="field"><label for="pw">${T.login.pass}</label>
+        <input class="input" id="pw" type="password" autocomplete="current-password" required></div>
+      <div class="err-msg" id="login-err"></div>
+      <button class="btn btn-block" type="submit">${T.login.go}</button>
+      <div class="hint">
+        <b>Демо-доступы:</b><br>
+        Суперадмин — <code>super</code> / <code>super</code><br>
+        Админ филиала Туран — <code>admin</code> / <code>admin</code><br>
+        Админ всех филиалов — <code>manager</code> / <code>manager</code><br>
+        Ученик — логин и пароль из раздела «Ученики»
+      </div>
+    </form>`;
+  $('#login-form').onsubmit = e => {
+    e.preventDefault();
+    const l = $('#lg').value.trim(), p = $('#pw').value;
+    const a = DB.admins.find(x=>x.login===l && x.pass===p);
+    const st = DB.students.find(x=>x.login===l && x.pass===p && x.status==='active');
+    if(a){ S.user = {...a}; S.page='dash'; }
+    else if(st){ S.user = {...st, role:'student', name:st.fio}; S.page='myTests'; }
+    else { $('#login-err').textContent = T.login.bad; return; }
+    S.branchFilter='all';
+    log('Вход в систему', S.user.login);
+    $('#login').style.display='none'; $('#app').style.display='block';
+    render();
+  };
+}
+
+function logout(){
+  log('Выход из системы', S.user.login);
+  S.user=null; S.run=null;
+  $('#app').style.display='none'; $('#login').style.display='grid';
+  renderLogin();
+}
+
+/* ============================================================
+   ОБОЛОЧКА
+   ============================================================ */
+const ICONS = {
+  dash:'<path d="M3 3h7v7H3zM14 3h7v4h-7zM14 11h7v10h-7zM3 14h7v7H3z"/>',
+  students:'<circle cx="9" cy="7" r="3"/><path d="M2 21v-2a5 5 0 015-5h4a5 5 0 015 5v2M17 4a3 3 0 010 6"/>',
+  groups:'<rect x="3" y="4" width="7" height="7" rx="1"/><rect x="14" y="4" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+  block:'<path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12l2 2 4-4"/>',
+  ent:'<path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1 3 3 6 3s6-2 6-3v-5"/>',
+  reports:'<path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/>',
+  questions:'<circle cx="12" cy="12" r="9"/><path d="M9.1 9a3 3 0 015.8 1c0 2-3 2.5-3 4"/><path d="M12 17h.01"/>',
+  admins:'<path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/>',
+  audit:'<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/>'
+};
+const icon = k => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">${ICONS[k]||ICONS.dash}</svg>`;
+
+function navItems(){
+  if(S.user.role==='student') return [['myTests',T.nav.myTests,'block'],['myResults',T.nav.myResults,'reports']];
+  const base = [['dash',T.nav.dash,'dash'],['students',T.nav.students,'students'],['groups',T.nav.groups,'groups'],
+    ['block',T.nav.block,'block'],['ent',T.nav.ent,'ent'],['reports',T.nav.reports,'reports'],
+    ['questions',T.nav.questions,'questions']];
+  if(S.user.role==='super') base.push(['admins',T.nav.admins,'admins'],['audit',T.nav.audit,'audit']);
+  return base;
+}
+
+function render(){
+  if(S.run){ renderRunner(); return; }
+  const canSwitch = S.user.role!=='student' && visibleBranchIds().length>1;
+  const roleLabel = S.user.role==='super' ? 'Суперадмин'
+    : S.user.role==='student' ? 'Ученик · '+groupName(S.user.groupId)
+    : (S.user.allBranches ? 'Администратор · все филиалы' : 'Администратор · '+branchName(S.user.branchId));
+
+  $('#app').innerHTML = `
+  <div class="shell">
+    ${S.sidebarOpen?'<div class="scrim" onclick="S.sidebarOpen=false;render()"></div>':''}
+    <aside class="sidebar ${S.sidebarOpen?'open':''}">
+      <div class="logo"><div class="logo-mark">Т</div>
+        <div><div style="font-weight:700;letter-spacing:-.02em">${T.app}</div>
+        <div class="muted" style="font-size:11px">${T.tagline}</div></div></div>
+      ${navItems().map(([k,label,ic])=>`
+        <button class="nav-item ${S.page===k?'active':''}" onclick="go('${k}')">${icon(ic)}<span>${label}</span></button>
+      `).join('')}
+      <div class="side-user">
+        <div class="avatar">${initials(S.user.name)}</div>
+        <div style="min-width:0"><div class="who-name">${esc(S.user.name)}</div>
+        <div class="who-role">${roleLabel}</div></div>
+      </div>
+    </aside>
+    <div class="main">
+      <div class="header">
+        <div style="display:flex;align-items:center;gap:12px">
+          <button class="burger" onclick="S.sidebarOpen=!S.sidebarOpen;render()" aria-label="Меню">☰</button>
+          ${canSwitch?`<select class="select" onchange="S.branchFilter=this.value;render()">
+            <option value="all">${T.allBranches}</option>
+            ${visibleBranchIds().map(id=>`<option value="${id}" ${S.branchFilter==String(id)?'selected':''}>${branchName(id)}</option>`).join('')}
+          </select>`:''}
+        </div>
+        <div class="who">
+          <div class="avatar">${initials(S.user.name)}</div>
+          <div><div class="who-name">${esc(S.user.name)}</div><div class="who-role">${roleLabel}</div></div>
+          <button class="btn btn-ghost btn-sm" onclick="logout()">${T.exit}</button>
+        </div>
+      </div>
+      <div class="page" id="page"></div>
+    </div>
+  </div>`;
+  ({dash:pageDash, students:pageStudents, groups:pageGroups, block:pageBlock, ent:pageEnt,
+    reports:pageReports, questions:pageQuestions, admins:pageAdmins, audit:pageAudit,
+    myTests:pageMyTests, myResults:pageMyResults}[S.page] || pageDash)();
+}
+const go = p => { S.page=p; S.sidebarOpen=false; render(); };
+
+/* ============================================================
+   ДАШБОРД
+   ============================================================ */
+function pageDash(){
+  const sts = scopedStudents().filter(s=>s.status==='active');
+  const grs = scopedGroups();
+  const todayTests = scopedTests().filter(t=>new Date(t.deadline)>=new Date());
+  const done = DB.attempts.filter(a=>a.finished && sts.some(s=>s.id===a.studentId));
+  const avg = done.length ? Math.round(done.reduce((s,a)=>s+pct(a.score,a.total),0)/done.length) : 0;
+  const live = Math.floor(Math.random()*4); // в реальной системе — активные сессии
+
+  // динамика за 7 дней
+  const days = [...Array(7)].map((_,i)=>{
+    const d = addDays(new Date(), i-6);
+    const day = done.filter(a=>new Date(a.started).toDateString()===d.toDateString());
+    return {d, v: day.length? Math.round(day.reduce((s,a)=>s+pct(a.score,a.total),0)/day.length):0};
+  });
+
+  $('#page').innerHTML = `
+    <div class="page-head"><div><h1>Дашборд</h1>
+      <div class="muted">${S.branchFilter==='all'?'Все доступные филиалы':'Филиал '+branchName(+S.branchFilter)}</div></div></div>
+    <div class="grid stats" style="margin-bottom:14px">
+      ${statCard('Всего учеников', sts.length, grs.length+' групп')}
+      ${statCard('Тестов активно', todayTests.length,
+        todayTests.filter(t=>t.type==='block').length+' блочных · '+todayTests.filter(t=>t.type==='ent').length+' ЕНТ')}
+      ${statCard('Сейчас проходят тест', `<span class="live"><span class="dot"></span>${live}</span>`,'в реальном времени')}
+      ${statCard('Средний балл', avg+'%', done.length+' сданных работ')}
+    </div>
+    <div class="grid cols-2">
+      <div class="card card-pad">
+        <h2 style="margin-bottom:4px">Динамика среднего балла</h2>
+        <div class="muted" style="font-size:12px;margin-bottom:10px">Последние 7 дней</div>
+        <div class="bars">${days.map(x=>`
+          <div class="b"><b>${x.v||''}</b><i style="height:${x.v?Math.max(4,x.v*0.9):2}%"></i>
+          <span>${new Date(x.d).toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit'})}</span></div>`).join('')}
+        </div>
+      </div>
+      <div class="card card-pad">
+        <h2 style="margin-bottom:10px">Последние работы</h2>
+        ${done.slice(-6).reverse().map(a=>{
+          const s = DB.students.find(x=>x.id===a.studentId), t = DB.tests.find(x=>x.id===a.testId);
+          const p = pct(a.score,a.total);
+          return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)">
+            <div style="min-width:0"><div style="font-weight:500;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(s?s.fio:'—')}</div>
+            <div class="muted" style="font-size:11px">${esc(t?t.title:'—')}</div></div>
+            <span class="badge ${p>=70?'badge-ok':p>=50?'badge-warn':'badge-err'}">${p}%</span></div>`;
+        }).join('') || '<div class="empty muted">Пока нет сданных работ</div>'}
+      </div>
+    </div>`;
+}
+const statCard = (label,value,sub) => `<div class="card card-pad stat">
+  <div class="label">${label}</div><div class="value">${value}</div><div class="sub">${sub}</div></div>`;
+
+/* ============================================================
+   УЧЕНИКИ
+   ============================================================ */
+let stFilter = {group:'all', q:''};
+function pageStudents(){
+  let list = scopedStudents();
+  if(stFilter.group==='none') list = list.filter(s=>!s.groupId);
+  else if(stFilter.group!=='all') list = list.filter(s=>s.groupId==+stFilter.group);
+  if(stFilter.q) list = list.filter(s=>s.fio.toLowerCase().includes(stFilter.q.toLowerCase()));
+
+  $('#page').innerHTML = `
+    <div class="page-head">
+      <div><h1>Ученики</h1><div class="muted">${list.length} из ${scopedStudents().length}</div></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost btn-sm" onclick="exportCSV()">Экспорт в Excel</button>
+        <button class="btn btn-sm" onclick="modalAddStudent()">+ Добавить ученика</button>
+      </div>
+    </div>
+    <div class="toolbar">
+      <input class="input" style="max-width:220px" placeholder="Поиск по ФИО" value="${esc(stFilter.q)}"
+        oninput="stFilter.q=this.value;pageStudents();setTimeout(()=>{const i=document.querySelector('.toolbar .input');i.focus();i.setSelectionRange(i.value.length,i.value.length)})">
+      <select class="select" onchange="stFilter.group=this.value;pageStudents()">
+        <option value="all">Все группы</option><option value="none" ${stFilter.group==='none'?'selected':''}>Без группы</option>
+        ${scopedGroups().map(g=>`<option value="${g.id}" ${stFilter.group==String(g.id)?'selected':''}>${g.name}</option>`).join('')}
+      </select>
+    </div>
+    <div class="card card-stack table-wrap">
+      <table class="stack"><thead><tr>
+        <th>ФИО</th><th>Филиал</th><th>Группа</th><th>Логин</th><th>Пароль</th><th>Статус</th><th></th>
+      </tr></thead><tbody>
+      ${list.map(s=>`<tr>
+        <td data-l="ФИО" style="font-weight:500">${esc(s.fio)}</td>
+        <td data-l="Филиал" class="muted">${branchName(s.branchId)}</td>
+        <td data-l="Группа">${s.groupId?`<span class="badge badge-blue">${groupName(s.groupId)}</span>`:'<span class="badge badge-gray">нет</span>'}</td>
+        <td data-l="Логин"><code class="mono">${s.login}</code></td>
+        <td data-l="Пароль"><code class="mono">${s.pass}</code></td>
+        <td data-l="Статус"><span class="badge ${s.status==='active'?'badge-ok':'badge-gray'}">${s.status==='active'?'активен':'архив'}</span></td>
+        <td data-l="" style="text-align:right;white-space:nowrap">
+          <button class="btn btn-ghost btn-sm" onclick="modalMove(${s.id})">Перенести</button>
+          <button class="btn btn-ghost btn-sm" onclick="delStudent(${s.id})">Удалить</button>
+        </td></tr>`).join('') || `<tr><td colspan="7"><div class="empty"><strong>Учеников не найдено</strong>Измените фильтры или добавьте ученика</div></td></tr>`}
+      </tbody></table>
+    </div>`;
+}
+
+function modalAddStudent(){
+  openModal('Новый ученик', `
+    <div class="field"><label>ФИО (Фамилия Имя)</label><input class="input" id="m-fio" placeholder="Абдуллаев Ерасыл"></div>
+    <div class="field"><label>Филиал</label><select class="select" id="m-branch" style="width:100%">
+      ${visibleBranchIds().map(id=>`<option value="${id}">${branchName(id)}</option>`).join('')}</select></div>
+    <div class="field"><label>Группа</label><select class="select" id="m-group" style="width:100%">
+      <option value="">Без группы</option>
+      ${scopedGroups().map(g=>`<option value="${g.id}">${g.name}</option>`).join('')}</select></div>
+    <div class="hint">Логин и пароль сгенерируются автоматически: фамилия + первая буква имени + номер; пароль — 7 символов без похожих знаков (0/O, 1/l/I).</div>`,
+    'Добавить', ()=>{
+      const fio = $('#m-fio').value.trim();
+      if(!fio.includes(' ')){ toast('Укажите фамилию и имя'); return false; }
+      const st = addStudent(fio, +$('#m-branch').value, $('#m-group').value?+$('#m-group').value:null);
+      log('Создан ученик', `${fio} · логин ${st.login}`);
+      toast(`Ученик добавлен · логин ${st.login}`);
+      pageStudents();
+    });
+}
+function modalMove(id){
+  const s = DB.students.find(x=>x.id===id);
+  openModal('Перенести ученика', `
+    <div class="muted" style="margin-bottom:12px">${esc(s.fio)} · сейчас: <b>${groupName(s.groupId)}</b></div>
+    <div class="field"><label>Новая группа</label><select class="select" id="m-g" style="width:100%">
+      <option value="">Без группы</option>
+      ${scopedGroups().map(g=>`<option value="${g.id}" ${s.groupId===g.id?'selected':''}>${g.name}</option>`).join('')}
+    </select></div>
+    <div class="hint">История результатов прошлых тестов сохраняется.</div>`,
+    'Перенести', ()=>{
+      const old = groupName(s.groupId);
+      s.groupId = $('#m-g').value?+$('#m-g').value:null;
+      if(s.groupId) s.branchId = DB.groups.find(g=>g.id===s.groupId).branchId;
+      log('Перенос ученика', `${s.fio}: ${old} → ${groupName(s.groupId)}`);
+      toast('Ученик перенесён'); pageStudents();
+    });
+}
+function delStudent(id){
+  const s = DB.students.find(x=>x.id===id);
+  openModal('Удалить ученика?', `<p>Ученик <b>${esc(s.fio)}</b> будет переведён в архив. Результаты его тестов сохранятся.</p>`,
+    'Удалить', ()=>{ s.status='archived'; log('Удалён ученик', s.fio); toast('Ученик в архиве'); pageStudents(); }, true);
+}
+function exportCSV(){
+  const rows = [['ФИО','Филиал','Группа','Логин','Пароль']];
+  scopedStudents().forEach(s=>rows.push([s.fio,branchName(s.branchId),groupName(s.groupId),s.login,s.pass]));
+  const csv = '\uFEFF'+rows.map(r=>r.map(c=>`"${c}"`).join(';')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download = 'ucheniki.csv'; a.click();
+  log('Экспорт учеников в Excel', scopedStudents().length+' записей');
+  toast('Файл выгружен (учтены фильтры)');
+}
+
+/* ============================================================
+   ГРУППЫ
+   ============================================================ */
+function pageGroups(){
+  const grs = scopedGroups();
+  $('#page').innerHTML = `
+    <div class="page-head"><div><h1>Группы</h1><div class="muted">${grs.length} групп</div></div>
+      <button class="btn btn-sm" onclick="modalAddGroup()">+ Создать группу</button></div>
+    <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(280px,1fr))">
+    ${grs.map(g=>{
+      const n = DB.students.filter(s=>s.groupId===g.id && s.status==='active').length;
+      return `<div class="card card-pad">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+          <div><h2>${g.name}</h2><div class="muted" style="font-size:12px">${branchName(g.branchId)} · ${n} учеников</div></div>
+          <span class="badge badge-blue">${n}</span>
+        </div>
+        <div style="margin:12px 0;display:flex;gap:6px;flex-wrap:wrap">
+          ${g.profiles.map(p=>`<span class="badge badge-gray">${subjName(p)}</span>`).join('')}
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn btn-ghost btn-sm" onclick="modalBulkAdd(${g.id})">Добавить учеников</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportPDF(${g.id})">Логины в PDF</button>
+        </div></div>`;
+    }).join('') || '<div class="empty">Групп пока нет</div>'}</div>`;
+}
+function modalAddGroup(){
+  const profs = SUBJECTS.filter(s=>s.kind==='prof');
+  openModal('Новая группа',`
+    <div class="field"><label>Название</label><input class="input" id="g-name" placeholder="I3-Туран"></div>
+    <div class="field"><label>Филиал</label><select class="select" id="g-branch" style="width:100%">
+      ${visibleBranchIds().map(id=>`<option value="${id}">${branchName(id)}</option>`).join('')}</select></div>
+    <div class="field"><label>Профильный предмет 1</label><select class="select" id="g-p1" style="width:100%">
+      ${profs.map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div>
+    <div class="field"><label>Профильный предмет 2</label><select class="select" id="g-p2" style="width:100%">
+      ${profs.map((s,i)=>`<option value="${s.id}" ${i===1?'selected':''}>${s.name}</option>`).join('')}</select></div>
+    <div class="hint">Профильные предметы наследуются всеми учениками группы — на ЕНТ ученик их не выбирает.</div>`,
+    'Создать', ()=>{
+      const name = $('#g-name').value.trim();
+      const p1=$('#g-p1').value, p2=$('#g-p2').value;
+      if(!name){ toast('Укажите название'); return false; }
+      if(p1===p2){ toast('Профильные предметы должны отличаться'); return false; }
+      DB.groups.push({id:DB.seq.group++, name, branchId:+$('#g-branch').value, curatorId:S.user.id, profiles:[p1,p2]});
+      log('Создана группа', name); toast('Группа создана'); pageGroups();
+    });
+}
+function modalBulkAdd(gid){
+  const g = DB.groups.find(x=>x.id===gid);
+  const cand = scopedStudents().filter(s=>s.groupId!==gid && s.status==='active');
+  openModal(`Добавить в ${g.name}`, `
+    <div class="muted" style="margin-bottom:10px">Отметьте учеников чекбоксами — можно сразу 10–15 человек.</div>
+    <div class="check-list">${cand.map(s=>`
+      <label class="check-row"><input type="checkbox" value="${s.id}" class="bulk">
+        <div style="flex:1"><div style="font-weight:500">${esc(s.fio)}</div>
+        <div class="muted" style="font-size:11px">${branchName(s.branchId)} · ${groupName(s.groupId)}</div></div>
+      </label>`).join('') || '<div class="empty">Свободных учеников нет</div>'}</div>`,
+    'Добавить выбранных', ()=>{
+      const ids = [...document.querySelectorAll('.bulk:checked')].map(c=>+c.value);
+      if(!ids.length){ toast('Никто не выбран'); return false; }
+      ids.forEach(id=>{const s=DB.students.find(x=>x.id===id); s.groupId=gid; s.branchId=g.branchId;});
+      log('Пакетное добавление в группу', `${ids.length} учеников → ${g.name}`);
+      toast(`Добавлено: ${ids.length}`); pageGroups();
+    });
+}
+function exportPDF(gid){
+  const g = DB.groups.find(x=>x.id===gid);
+  const list = DB.students.filter(s=>s.groupId===gid && s.status==='active');
+  const w = window.open('','_blank');
+  w.document.write(`<html><head><meta charset="utf-8"><title>Логины — ${g.name}</title>
+  <style>body{font-family:Inter,Arial,sans-serif;padding:32px;color:#111827}
+  h1{font-size:20px;margin:0 0 4px}p{color:#6B7280;font-size:12px;margin:0 0 20px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{background:#F8F9FB;text-align:left;padding:9px;border:1px solid #E5E7EB;font-size:11px;text-transform:uppercase;color:#6B7280}
+  td{padding:9px;border:1px solid #E5E7EB}code{font-family:monospace;font-weight:600}
+  @media print{@page{margin:14mm}}</style></head><body>
+  <h1>Талан · ${g.name}</h1><p>Филиал ${branchName(g.branchId)} · ${fmtDate(new Date())} · учеников: ${list.length}</p>
+  <table><thead><tr><th>№</th><th>ФИО</th><th>Логин</th><th>Пароль</th></tr></thead><tbody>
+  ${list.map((s,i)=>`<tr><td>${i+1}</td><td>${s.fio}</td><td><code>${s.login}</code></td><td><code>${s.pass}</code></td></tr>`).join('')}
+  </tbody></table><script>window.onload=()=>window.print()<\/script></body></html>`);
+  w.document.close();
+  log('Экспорт логинов в PDF', g.name);
+  toast('Откроется окно печати → «Сохранить как PDF»');
+}
+
+/* ---------- модалка ---------- */
+function openModal(title, body, okText, onOk, danger){
+  $('#modal-root').innerHTML = `<div class="modal-bg" onclick="if(event.target===this)closeModal()">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-head"><h2>${title}</h2><button class="x" onclick="closeModal()" aria-label="Закрыть">×</button></div>
+      <div class="modal-body">${body}</div>
+      <div class="modal-foot"><button class="btn btn-ghost" onclick="closeModal()">Отмена</button>
+        <button class="btn ${danger?'btn-danger':''}" id="modal-ok">${okText}</button></div>
+    </div></div>`;
+  $('#modal-ok').onclick = () => { if(onOk() !== false) closeModal(); };
+}
+const closeModal = () => $('#modal-root').innerHTML='';
+
+/* ============================================================
+   БЛОЧНЫЕ ТЕСТЫ
+   ============================================================ */
+function pageBlock(){ pageTests('block'); }
+function pageEnt(){ pageTests('ent'); }
+
+function pageTests(type){
+  const list = scopedTests().filter(t=>t.type===type);
+  const isEnt = type==='ent';
+  $('#page').innerHTML = `
+    <div class="page-head"><div><h1>${isEnt?'ЕНТ — пробные экзамены':'Блочные тесты'}</h1>
+      <div class="muted">${isEnt?'120 заданий · 5 предметов · 240 минут':'5 вопросов с каждой темы: 2А + 2Б + 1С'}</div></div>
+      <button class="btn btn-sm" onclick="${isEnt?'modalEnt()':'modalBlock()'}">+ ${isEnt?'Назначить ЕНТ':'Создать тест'}</button></div>
+    <div class="card card-stack table-wrap"><table class="stack"><thead><tr>
+      <th>Название</th><th>${isEnt?'Вариант':'Предмет / темы'}</th><th>Группы</th><th>Время</th>
+      <th>Попытки</th><th>Дедлайн</th><th>Сдали</th><th></th></tr></thead><tbody>
+    ${list.map(t=>{
+      const target = DB.students.filter(s=>t.groupIds.includes(s.groupId)&&s.status==='active').length;
+      const done = DB.attempts.filter(a=>a.testId===t.id&&a.finished).length;
+      return `<tr>
+        <td data-l="Тест" style="font-weight:500">${esc(t.title)}</td>
+        <td data-l="${isEnt?'Вариант':'Предмет'}" class="muted">${isEnt?('Вариант №'+t.variantNo):esc(subjName(t.subject))+' · '+t.topics.length+' тем'}</td>
+        <td data-l="Группы">${t.groupIds.map(g=>`<span class="badge badge-blue">${groupName(g)}</span>`).join(' ')}</td>
+        <td data-l="Время">${t.minutes} мин</td><td data-l="Попытки">${t.attemptsAllowed}</td>
+        <td data-l="Дедлайн" class="muted">${fmtDate(t.deadline)}</td>
+        <td data-l="Сдали"><span class="badge ${done>=target?'badge-ok':done?'badge-warn':'badge-gray'}">${done} / ${target}</span></td>
+        <td data-l="" style="text-align:right"><button class="btn btn-ghost btn-sm" onclick="testReport(${t.id})">Результаты</button></td>
+      </tr>`;
+    }).join('') || `<tr><td colspan="8"><div class="empty"><strong>Тестов нет</strong>Создайте первый тест</div></td></tr>`}
+    </tbody></table></div>`;
+}
+
+function modalBlock(){
+  const subj = 'inf';
+  openModal('Новый блочный тест', `
+    <div class="field"><label>Название</label><input class="input" id="t-title" placeholder="Информатика — блок 2"></div>
+    <div class="field"><label>Предмет</label>
+      <select class="select" id="t-subj" style="width:100%" onchange="renderTopics(this.value)">
+        ${Object.keys(TOPICS).map(k=>`<option value="${k}" ${k===subj?'selected':''}>${subjName(k)}</option>`).join('')}
+      </select></div>
+    <div class="field"><label>Темы (от 1 до 40) — с каждой темы система возьмёт 5 случайных вопросов</label>
+      <div class="check-list" id="t-topics"></div></div>
+    <div class="field"><label>Группы</label><div class="check-list">
+      ${scopedGroups().map(g=>`<label class="check-row"><input type="checkbox" class="t-grp" value="${g.id}">
+        <span>${g.name} <span class="muted">· ${branchName(g.branchId)}</span></span></label>`).join('')}
+    </div></div>
+    <div style="display:flex;gap:10px">
+      <div class="field" style="flex:1"><label>Время, мин</label><input class="input" id="t-min" type="number" value="40"></div>
+      <div class="field" style="flex:1"><label>Попыток</label><input class="input" id="t-att" type="number" value="1" min="1"></div>
+      <div class="field" style="flex:1"><label>Дедлайн</label><input class="input" id="t-dl" type="date" value="${addDays(new Date(),7).toISOString().slice(0,10)}"></div>
+    </div>
+    <div class="hint">Вариант генерируется индивидуально для каждого ученика: свой набор вопросов и свой порядок ответов — списать у соседа по позиции нельзя.</div>`,
+    'Создать тест', ()=>{
+      const topics = [...document.querySelectorAll('.t-topic:checked')].map(c=>c.value);
+      const groupIds = [...document.querySelectorAll('.t-grp:checked')].map(c=>+c.value);
+      const title = $('#t-title').value.trim();
+      if(!title){toast('Укажите название');return false}
+      if(!topics.length){toast('Выберите хотя бы одну тему');return false}
+      if(!groupIds.length){toast('Выберите хотя бы одну группу');return false}
+      DB.tests.push({id:DB.seq.test++, type:'block', title, subject:$('#t-subj').value, topics, groupIds,
+        minutes:+$('#t-min').value, attemptsAllowed:+$('#t-att').value, deadline:new Date($('#t-dl').value), created:new Date()});
+      log('Создан блочный тест', `${title} · ${topics.length} тем · ${topics.length*5} вопросов`);
+      toast(`Тест создан · ${topics.length*5} вопросов`); pageBlock();
+    });
+  renderTopics(subj);
+}
+function renderTopics(subj){
+  $('#t-topics').innerHTML = TOPICS[subj].map(t=>`
+    <label class="check-row"><input type="checkbox" class="t-topic" value="${esc(t)}"><span>${esc(t)}</span></label>`).join('');
+}
+function modalEnt(){
+  openModal('Назначить пробное ЕНТ', `
+    <div class="field"><label>Название</label><input class="input" id="e-title" value="Пробное ЕНТ — вариант №2"></div>
+    <div class="field"><label>Номер варианта</label><input class="input" id="e-var" type="number" value="2" min="1"></div>
+    <div class="field"><label>Группы</label><div class="check-list">
+      ${scopedGroups().map(g=>`<label class="check-row"><input type="checkbox" class="e-grp" value="${g.id}">
+        <span>${g.name} <span class="muted">· профили: ${g.profiles.map(subjName).join(', ')}</span></span></label>`).join('')}
+    </div></div>
+    <div style="display:flex;gap:10px">
+      <div class="field" style="flex:1"><label>Время, мин</label><input class="input" id="e-min" type="number" value="240"></div>
+      <div class="field" style="flex:1"><label>Дата</label><input class="input" id="e-dl" type="date" value="${addDays(new Date(),7).toISOString().slice(0,10)}"></div>
+    </div>
+    <div class="hint">Структура: История Казахстана (20) + Грамотность чтения (10) + Мат. грамотность (10) + 2 профильных по 40 = <b>120 заданий</b>. Профильные берутся из группы автоматически.<br>
+    Время 240 мин — редактируемый параметр (например, +40 мин для детей с ООП).</div>`,
+    'Назначить', ()=>{
+      const groupIds = [...document.querySelectorAll('.e-grp:checked')].map(c=>+c.value);
+      if(!groupIds.length){toast('Выберите группы');return false}
+      DB.tests.push({id:DB.seq.test++, type:'ent', title:$('#e-title').value.trim()||'Пробное ЕНТ',
+        variantNo:+$('#e-var').value, groupIds, minutes:+$('#e-min').value, attemptsAllowed:1,
+        deadline:new Date($('#e-dl').value), created:new Date(), entSubjects:[]});
+      log('Назначено пробное ЕНТ', `вариант №${$('#e-var').value} · ${groupIds.length} групп`);
+      toast('ЕНТ назначено'); pageEnt();
+    });
+}
+
+/* ============================================================
+   ЛИЧНЫЙ КАБИНЕТ УЧЕНИКА
+   ============================================================ */
+function myTests(){ return DB.tests.filter(t=>t.groupIds.includes(S.user.groupId)); }
+function myAttempts(tid){ return DB.attempts.filter(a=>a.studentId===S.user.id&&a.testId===tid&&a.finished); }
+
+function pageMyTests(){
+  const list = myTests();
+  $('#page').innerHTML = `
+    <div class="page-head"><div><h1>Мои тесты</h1>
+      <div class="muted">${groupName(S.user.groupId)} · профили: ${(DB.groups.find(g=>g.id===S.user.groupId)||{profiles:[]}).profiles.map(subjName).join(', ')}</div></div></div>
+    <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(300px,1fr))">
+    ${list.map(t=>{
+      const att = myAttempts(t.id);
+      const left = t.attemptsAllowed - att.length;
+      const best = att.length?Math.max(...att.map(a=>pct(a.score,a.total))):null;
+      const overdue = new Date(t.deadline) < new Date();
+      const daysLeft = Math.ceil((new Date(t.deadline)-new Date())/86400000);
+      return `<div class="card card-pad">
+        <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start">
+          <h2>${esc(t.title)}</h2>
+          <span class="badge ${t.type==='ent'?'badge-blue':'badge-gray'}">${t.type==='ent'?'ЕНТ':'Блочный'}</span></div>
+        <div class="muted" style="font-size:12px;margin:8px 0 12px">
+          ${t.type==='ent'?'120 заданий':t.topics.length*5+' вопросов'} · ${t.minutes} мин ·
+          попыток: ${att.length}/${t.attemptsAllowed}</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+          <div>${best!==null?`<span class="badge ${best>=70?'badge-ok':best>=50?'badge-warn':'badge-err'}">Лучший: ${best}%</span>`
+            :overdue?'<span class="badge badge-err">Просрочено</span>'
+            :`<span class="badge ${daysLeft<=2?'badge-warn':'badge-gray'}">Осталось ${daysLeft} дн.</span>`}</div>
+          ${left>0 && !overdue
+            ? `<button class="btn btn-sm" onclick="startTest(${t.id})">${att.length?'Ещё попытка':'Начать тест'}</button>`
+            : att.length?`<button class="btn btn-ghost btn-sm" onclick="showResult(${att[att.length-1].id})">Разбор</button>`:''}
+        </div></div>`;
+    }).join('') || '<div class="empty"><strong>Назначенных тестов нет</strong>Загляните позже</div>'}</div>`;
+}
+function pageMyResults(){
+  const att = DB.attempts.filter(a=>a.studentId===S.user.id&&a.finished);
+  $('#page').innerHTML = `
+    <div class="page-head"><div><h1>Мои результаты</h1><div class="muted">${att.length} завершённых работ</div></div></div>
+    <div class="card card-stack table-wrap"><table class="stack"><thead><tr><th>Тест</th><th>Дата</th><th>Баллы</th><th>Процент</th><th></th></tr></thead><tbody>
+    ${att.map(a=>{const t=DB.tests.find(x=>x.id===a.testId),p=pct(a.score,a.total);
+      return `<tr><td data-l="Тест" style="font-weight:500">${esc(t?t.title:'—')}</td><td data-l="Дата" class="muted">${fmtDate(a.started)}</td>
+      <td data-l="Баллы">${a.score} / ${a.total}</td><td data-l="Процент"><span class="badge ${p>=70?'badge-ok':p>=50?'badge-warn':'badge-err'}">${p}%</span></td>
+      <td data-l="" style="text-align:right"><button class="btn btn-ghost btn-sm" onclick="showResult(${a.id})">Разбор</button></td></tr>`;
+    }).join('') || `<tr><td colspan="5"><div class="empty">Пока пусто</div></td></tr>`}
+    </tbody></table></div>`;
+}
+
+/* ============================================================
+   ПРОХОЖДЕНИЕ ТЕСТА
+   ============================================================ */
+function startTest(tid){
+  const t = DB.tests.find(x=>x.id===tid);
+  if(t.type==='ent'){
+    const g = DB.groups.find(x=>x.id===S.user.groupId);
+    t.entSubjects = [{subject:'hist',count:20},{subject:'read',count:10},{subject:'mathlit',count:10},
+      ...g.profiles.map(p=>({subject:p,count:40}))];
+  }
+  const variant = buildVariant(t);
+  S.run = {test:t, variant, answers:{}, cur:0, endsAt: Date.now()+t.minutes*60000, tabSwitches:0};
+  document.addEventListener('visibilitychange', onHide);
+  render();
+}
+function onHide(){ if(document.hidden && S.run){ S.run.tabSwitches++; } }
+
+function renderRunner(){
+  const r = S.run, v = r.variant, q = DB.questions.find(x=>x.id===v[r.cur].qid);
+  const answered = Object.keys(r.answers).length;
+  $('#app').innerHTML = `
+    <div class="timer-bar">
+      <div style="display:flex;align-items:center;gap:12px;min-width:0">
+        <strong style="font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.test.title)}</strong>
+        <div class="progress"><i style="width:${answered/v.length*100}%"></i></div>
+        <span class="muted" style="font-size:12px;white-space:nowrap">${answered}/${v.length}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="timer" id="timer">--:--</span>
+        <button class="btn btn-sm" onclick="finishTest()">Завершить</button>
+      </div>
+    </div>
+    <div class="page" style="max-width:820px;margin:0 auto">
+      <div class="q-card">
+        <div class="muted" style="font-size:12px">Вопрос ${r.cur+1} из ${v.length} · ${esc(q.topic)} · уровень ${q.level}</div>
+        <div class="q-text">${esc(q.text)}</div>
+        ${v[r.cur].order.map((origIdx,pos)=>`
+          <div class="opt ${r.answers[r.cur]===pos?'sel':''}" onclick="answer(${pos})" tabindex="0"
+            onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();answer(${pos})}">
+            <div class="opt-key">${'АБВГ'[pos]}</div><div>${esc(q.options[origIdx])}</div></div>`).join('')}
+        <div class="runner-nav">
+          <button class="btn btn-ghost" ${r.cur===0?'disabled':''} onclick="S.run.cur--;renderRunner()">← Назад</button>
+          <button class="btn" ${r.cur===v.length-1?'disabled':''} onclick="S.run.cur++;renderRunner()">Далее →</button>
+        </div>
+      </div>
+      <div class="card card-pad" style="margin-top:14px">
+        <div class="muted" style="font-size:12px;margin-bottom:8px">Карта вопросов</div>
+        <div class="qmap">${v.map((_,i)=>`<button class="${i===r.cur?'cur':r.answers[i]!==undefined?'done':''}"
+          onclick="S.run.cur=${i};renderRunner()">${i+1}</button>`).join('')}</div>
+      </div>
+    </div>`;
+  tick();
+}
+function answer(pos){ // оптимистичное обновление: сразу рисуем, «сохранение» мгновенное
+  S.run.answers[S.run.cur] = pos;
+  if(S.run.cur < S.run.variant.length-1) setTimeout(()=>{S.run.cur++; renderRunner()}, 180);
+  else renderRunner();
+}
+let timerId=null;
+function tick(){
+  clearInterval(timerId);
+  const upd = ()=>{
+    if(!S.run) return clearInterval(timerId);
+    const ms = S.run.endsAt - Date.now();
+    if(ms<=0){ clearInterval(timerId); toast('Время вышло — тест завершён автоматически'); finishTest(true); return; }
+    const el = $('#timer'); if(!el) return;
+    const m = Math.floor(ms/60000), s = Math.floor(ms%60000/1000);
+    el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    el.classList.toggle('low', ms < 5*60000);
+  };
+  upd(); timerId = setInterval(upd,1000);
+}
+function finishTest(auto){
+  const r = S.run; if(!r) return;
+  const doIt = ()=>{
+    clearInterval(timerId);
+    document.removeEventListener('visibilitychange', onHide);
+    let score = 0; const byTopic = {};
+    r.variant.forEach((v,i)=>{
+      const q = DB.questions.find(x=>x.id===v.qid);
+      byTopic[q.topic] = byTopic[q.topic] || {ok:0,total:0};
+      byTopic[q.topic].total++;
+      if(r.answers[i] === v.correctPos){ score++; byTopic[q.topic].ok++; } // неотвеченные = 0 баллов
+    });
+    const a = {id:DB.seq.attempt++, testId:r.test.id, studentId:S.user.id, finished:true,
+      score, total:r.variant.length, byTopic, started:new Date(), tabSwitches:r.tabSwitches,
+      detail:r.variant.map((v,i)=>({qid:v.qid, chosen:r.answers[i], correctPos:v.correctPos, order:v.order}))};
+    DB.attempts.push(a);
+    S.run = null;
+    showResult(a.id);
+  };
+  if(auto) return doIt();
+  openModal('Завершить тест?', `<p>Отвечено ${Object.keys(r.answers).length} из ${r.variant.length}. Неотвеченные вопросы будут засчитаны как 0 баллов.</p>`,
+    'Завершить', ()=>{ doIt(); });
+}
+
+/* ---------- разбор ---------- */
+function showResult(aid){
+  const a = DB.attempts.find(x=>x.id===aid), t = DB.tests.find(x=>x.id===a.testId), p = pct(a.score,a.total);
+  S.page='myResults'; S.run=null; render();
+  $('#page').innerHTML = `
+    <div class="page-head"><div><h1>Результаты теста</h1><div class="muted">${esc(t.title)} · ${fmtTime(a.started)}</div></div>
+      <button class="btn btn-ghost btn-sm" onclick="go('myTests')">← К тестам</button></div>
+    <div class="grid stats" style="margin-bottom:14px">
+      ${statCard('Итоговый балл', a.score+' / '+a.total, 'правильных ответов')}
+      ${statCard('Процент', p+'%', p>=70?'отличный результат':p>=50?'есть над чем поработать':'нужна доработка')}
+      ${statCard('Уходов со страницы', a.tabSwitches||0, 'зафиксировано системой')}
+    </div>
+    <div class="card card-pad" style="margin-bottom:14px">
+      <h2 style="margin-bottom:10px">По темам</h2>
+      ${Object.entries(a.byTopic).map(([topic,v])=>{
+        const tp = pct(v.ok,v.total);
+        return `<div style="margin-bottom:10px">
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
+            <span>${esc(topic)}</span><b class="${tp>=70?'':'muted'}">${v.ok}/${v.total}</b></div>
+          <div class="progress" style="max-width:none"><i style="width:${tp}%;background:${tp>=70?'var(--ok)':tp>=50?'var(--warn)':'var(--err)'}"></i></div>
+        </div>`;
+      }).join('')}
+    </div>
+    ${a.detail?`<h2 style="margin-bottom:10px">Разбор по вопросам</h2>
+    ${a.detail.map((d,i)=>{
+      const q = DB.questions.find(x=>x.id===d.qid);
+      const ok = d.chosen === d.correctPos;
+      return `<div class="card card-pad" style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;gap:8px">
+          <div class="muted" style="font-size:12px">Вопрос ${i+1} · ${esc(q.topic)}</div>
+          <span class="badge ${ok?'badge-ok':d.chosen===undefined?'badge-gray':'badge-err'}">${ok?'верно':d.chosen===undefined?'нет ответа':'ошибка'}</span></div>
+        <div class="q-text" style="font-size:14px;margin:8px 0 12px">${esc(q.text)}</div>
+        ${d.order.map((origIdx,pos)=>{
+          const cls = pos===d.correctPos?'right':(pos===d.chosen?'wrong':'');
+          return `<div class="opt ${cls}" style="cursor:default;min-height:auto;padding:9px 12px">
+            <div class="opt-key">${'АБВГ'[pos]}</div><div>${esc(q.options[origIdx])}</div>
+            ${pos===d.correctPos?'<span class="badge badge-ok" style="margin-left:auto">правильный</span>':
+              pos===d.chosen?'<span class="badge badge-err" style="margin-left:auto">ваш ответ</span>':''}</div>`;
+        }).join('')}</div>`;
+    }).join('')}`:'<div class="card card-pad muted">Детальный разбор доступен для тестов, пройденных в этой сессии.</div>'}`;
+}
+
+/* ============================================================
+   ОТЧЁТЫ
+   ============================================================ */
+let repFilter = {group:'all', period:'30'};
+function pageReports(){
+  let sts = scopedStudents().filter(s=>s.status==='active');
+  if(repFilter.group!=='all') sts = sts.filter(s=>s.groupId==+repFilter.group);
+  const since = addDays(new Date(), -(+repFilter.period));
+  const att = DB.attempts.filter(a=>a.finished && sts.some(s=>s.id===a.studentId) && new Date(a.started)>=since);
+
+  // лучший результат на ученика (в зачёт идёт лучшая попытка)
+  const best = {};
+  att.forEach(a=>{const p=pct(a.score,a.total); if(!best[a.studentId]||p>best[a.studentId].p) best[a.studentId]={p,a};});
+  const rank = Object.entries(best).map(([sid,v])=>({st:DB.students.find(s=>s.id===+sid), p:v.p}))
+    .sort((x,y)=>y.p-x.p);
+  const avg = rank.length?Math.round(rank.reduce((s,r)=>s+r.p,0)/rank.length):0;
+  const assigned = sts.reduce((n,s)=>n+DB.tests.filter(t=>t.groupIds.includes(s.groupId)).length,0);
+  const completion = pct(att.length, assigned);
+
+  // ошибки по темам
+  const topics = {};
+  att.forEach(a=>Object.entries(a.byTopic||{}).forEach(([t,v])=>{
+    topics[t]=topics[t]||{ok:0,total:0}; topics[t].ok+=v.ok; topics[t].total+=v.total;}));
+  const weak = Object.entries(topics).map(([t,v])=>({t,p:pct(v.ok,v.total),v})).sort((a,b)=>a.p-b.p).slice(0,8);
+
+  $('#page').innerHTML = `
+    <div class="page-head"><div><h1>Отчёты</h1><div class="muted">${sts.length} учеников · ${att.length} работ за период</div></div>
+      <button class="btn btn-ghost btn-sm" onclick="toast('Экспорт учитывает применённые фильтры')">Экспортировать</button></div>
+    <div class="toolbar">
+      <select class="select" onchange="repFilter.group=this.value;pageReports()">
+        <option value="all">Все группы</option>
+        ${scopedGroups().map(g=>`<option value="${g.id}" ${repFilter.group==String(g.id)?'selected':''}>${g.name}</option>`).join('')}</select>
+      <select class="select" onchange="repFilter.period=this.value;pageReports()">
+        ${[['1','Сегодня'],['7','Неделя'],['30','Месяц'],['365','Год']].map(([v,l])=>
+          `<option value="${v}" ${repFilter.period===v?'selected':''}>${l}</option>`).join('')}</select>
+    </div>
+    <div class="grid stats" style="margin-bottom:14px">
+      ${statCard('Средний балл', avg+'%','по лучшим попыткам')}
+      ${statCard('Лучший результат', rank.length?rank[0].p+'%':'—', rank.length?esc(rank[0].st.fio):'нет данных')}
+      ${statCard('Худший результат', rank.length?rank[rank.length-1].p+'%':'—', rank.length?esc(rank[rank.length-1].st.fio):'нет данных')}
+      ${statCard('Процент выполнения', completion+'%', att.length+' из '+assigned+' назначенных')}
+    </div>
+    <div class="grid cols-2">
+      <div class="card card-pad">
+        <h2 style="margin-bottom:4px">Слабые темы</h2>
+        <div class="muted" style="font-size:12px;margin-bottom:12px">Где ошибаются чаще всего</div>
+        ${weak.map(w=>`<div style="margin-bottom:9px">
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
+            <span>${esc(w.t)}</span><b class="muted">${w.p}%</b></div>
+          <div class="progress" style="max-width:none"><i style="width:${w.p}%;background:${w.p>=70?'var(--ok)':w.p>=50?'var(--warn)':'var(--err)'}"></i></div>
+        </div>`).join('') || '<div class="empty muted">Нет данных за период</div>'}
+      </div>
+      <div class="card card-pad" style="overflow:hidden">
+        <h2 style="margin-bottom:4px">Рейтинг учеников</h2>
+        <div class="muted" style="font-size:12px;margin-bottom:8px">По лучшему результату</div>
+        <div style="max-height:320px;overflow-y:auto">
+        ${rank.map((r,i)=>`<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--line)">
+          <span class="muted" style="width:20px;font-size:12px;font-weight:600">${i+1}</span>
+          <div style="flex:1;min-width:0"><div style="font-weight:500;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.st.fio)}</div>
+            <div class="muted" style="font-size:11px">${groupName(r.st.groupId)}</div></div>
+          <span class="badge ${r.p>=70?'badge-ok':r.p>=50?'badge-warn':'badge-err'}">${r.p}%</span>
+        </div>`).join('') || '<div class="empty muted">Нет данных</div>'}
+        </div></div>
+    </div>`;
+}
+function testReport(tid){
+  const t = DB.tests.find(x=>x.id===tid);
+  const att = DB.attempts.filter(a=>a.testId===tid&&a.finished);
+  const sts = DB.students.filter(s=>t.groupIds.includes(s.groupId)&&s.status==='active');
+  openModal(`Результаты · ${esc(t.title)}`, `
+    <div class="muted" style="margin-bottom:12px">Сдали ${att.length} из ${sts.length}. В зачёт идёт лучшая попытка.</div>
+    <div class="table-wrap"><table class="stack"><thead><tr><th>Ученик</th><th>Группа</th><th>Балл</th><th>Уходы</th></tr></thead><tbody>
+    ${sts.map(s=>{
+      const my = att.filter(a=>a.studentId===s.id);
+      if(!my.length) return `<tr><td data-l="Ученик">${esc(s.fio)}</td><td data-l="Группа" class="muted">${groupName(s.groupId)}</td>
+        <td data-l="Балл"><span class="badge badge-gray">не сдал</span></td><td data-l="Уходы">—</td></tr>`;
+      const b = my.reduce((x,y)=>pct(y.score,y.total)>pct(x.score,x.total)?y:x);
+      const p = pct(b.score,b.total);
+      return `<tr><td data-l="Ученик" style="font-weight:500">${esc(s.fio)}</td><td data-l="Группа" class="muted">${groupName(s.groupId)}</td>
+        <td data-l="Балл"><span class="badge ${p>=70?'badge-ok':p>=50?'badge-warn':'badge-err'}">${b.score}/${b.total} · ${p}%</span></td>
+        <td data-l="Уходы">${b.tabSwitches?`<span class="badge badge-warn">${b.tabSwitches}</span>`:'<span class="muted">0</span>'}</td></tr>`;
+    }).join('')}</tbody></table></div>`, 'Закрыть', ()=>{});
+}
+
+/* ============================================================
+   БАЗА ВОПРОСОВ · АДМИНЫ · ЖУРНАЛ
+   ============================================================ */
+function pageQuestions(){
+  const bySubj = {};
+  DB.questions.forEach(q=>{bySubj[q.subject]=bySubj[q.subject]||{}; bySubj[q.subject][q.topic]=(bySubj[q.subject][q.topic]||0)+1;});
+  $('#page').innerHTML = `
+    <div class="page-head"><div><h1>База вопросов</h1>
+      <div class="muted">${DB.questions.length} вопросов · структура: предмет → тема → 4А + 4Б + 2С</div></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost btn-sm" onclick="toast('В рабочей версии — загрузка Excel-шаблона')">Загрузить Excel</button>
+        <button class="btn btn-sm" onclick="toast('В рабочей версии — форма добавления вопроса')">+ Вопрос</button></div></div>
+    <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr))">
+    ${Object.entries(bySubj).map(([s,topics])=>`
+      <div class="card card-pad"><h2>${subjName(s)}</h2>
+        <div class="muted" style="font-size:12px;margin-bottom:10px">${Object.keys(topics).length} тем · ${Object.values(topics).reduce((a,b)=>a+b,0)} вопросов</div>
+        ${Object.entries(topics).map(([t,n])=>`<div style="display:flex;justify-content:space-between;padding:5px 0;font-size:13px;border-bottom:1px solid var(--line)">
+          <span>${esc(t)}</span><span class="badge ${n===10?'badge-ok':'badge-warn'}">${n}</span></div>`).join('')}
+      </div>`).join('')}</div>`;
+}
+function pageAdmins(){
+  $('#page').innerHTML = `
+    <div class="page-head"><div><h1>Администраторы</h1>
+      <div class="muted">Создавать может только суперадмин · количество не ограничено</div></div>
+      <button class="btn btn-sm" onclick="modalAdmin()">+ Создать администратора</button></div>
+    <div class="card card-stack table-wrap"><table class="stack"><thead><tr><th>Имя</th><th>Логин</th><th>Роль</th><th>Доступ к филиалам</th></tr></thead><tbody>
+    ${DB.admins.map(a=>`<tr><td data-l="Имя" style="font-weight:500">${esc(a.name)}</td><td data-l="Логин"><code class="mono">${a.login}</code></td>
+      <td data-l="Роль"><span class="badge ${a.role==='super'?'badge-blue':'badge-gray'}">${a.role==='super'?'Суперадмин':'Администратор'}</span></td>
+      <td data-l="Доступ">${a.allBranches?'<span class="badge badge-ok">Все филиалы</span>':`<span class="badge badge-gray">${branchName(a.branchId)}</span>`}</td></tr>`).join('')}
+    </tbody></table></div>
+    <div class="hint" style="margin-top:14px;max-width:640px">Модель прав — таблица <code>admin_branch_access</code> (admin_id, branch_id, has_all_branches). Новые филиалы и роли добавляются без миграции схемы.</div>`;
+}
+function modalAdmin(){
+  openModal('Новый администратор', `
+    <div class="field"><label>Имя</label><input class="input" id="a-name" placeholder="Ержан Касымов"></div>
+    <div class="field"><label>Логин</label><input class="input" id="a-login" placeholder="erzhan"></div>
+    <div class="field"><label>Пароль</label><input class="input" id="a-pass" value="${makePass()}"></div>
+    <div class="field"><label>Филиал</label><select class="select" id="a-branch" style="width:100%">
+      ${DB.branches.map(b=>`<option value="${b.id}">${b.name}</option>`).join('')}</select></div>
+    <label class="check-row" style="border:1px solid var(--line);border-radius:10px">
+      <input type="checkbox" id="a-all"><span><b>Доступ ко всем филиалам</b><br>
+      <span class="muted" style="font-size:12px">Для руководителей центра. Системные настройки остаются только у суперадмина.</span></span></label>`,
+    'Создать', ()=>{
+      const name=$('#a-name').value.trim(), login=$('#a-login').value.trim();
+      if(!name||!login){toast('Заполните имя и логин');return false}
+      if(DB.admins.some(a=>a.login===login)){toast('Такой логин уже занят');return false}
+      DB.admins.push({id:DB.seq.admin++, login, pass:$('#a-pass').value, name, role:'admin',
+        branchId:+$('#a-branch').value, allBranches:$('#a-all').checked});
+      log('Создан администратор', `${name} · ${$('#a-all').checked?'все филиалы':branchName(+$('#a-branch').value)}`);
+      toast('Администратор создан'); pageAdmins();
+    });
+}
+function pageAudit(){
+  $('#page').innerHTML = `
+    <div class="page-head"><div><h1>Журнал действий</h1>
+      <div class="muted">Все деструктивные и ручные действия фиксируются</div></div></div>
+    <div class="card card-stack table-wrap"><table class="stack"><thead><tr><th>Время</th><th>Кто</th><th>Действие</th><th>Детали</th></tr></thead><tbody>
+    ${DB.audit.map(l=>`<tr><td data-l="Время" class="muted" style="white-space:nowrap">${fmtTime(l.at)}</td>
+      <td data-l="Кто" style="font-weight:500">${esc(l.who)}</td><td data-l="Действие">${esc(l.action)}</td><td data-l="Детали" class="muted">${esc(l.details||'')}</td></tr>`).join('')
+      || `<tr><td colspan="4"><div class="empty"><strong>Записей пока нет</strong>Действия появятся здесь по мере работы</div></td></tr>`}
+    </tbody></table></div>`;
+}
+
+renderLogin();
+
+</script>
+</body>
+</html>
