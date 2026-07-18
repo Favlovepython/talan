@@ -274,7 +274,7 @@ const subjName = id => (SUBJECTS.find(s=>s.id===id)||{}).name || id;
 
 const DB = {
   branches:[
-    {id:1,name:'Туран'},{id:2,name:'Сарыарка'},{id:3,name:'Алматы'},{id:4,name:'Шымкент'}
+    {id:1,name:'Туран'},{id:2,name:'Майлина'},{id:3,name:'Республика'},{id:4,name:'Пирамида'}
   ],
   admins:[
     {id:1,login:'super',   pass:'super',  name:'Айгерим Нурланова', role:'super', branchId:null, allBranches:true},
@@ -284,7 +284,7 @@ const DB = {
   groups:[
     {id:1,name:'I1-Туран',   branchId:1, curatorId:2, profiles:['math','phys']},
     {id:2,name:'I2-Туран',   branchId:1, curatorId:2, profiles:['bio','chem']},
-    {id:3,name:'S1-Сарыарка',branchId:2, curatorId:3, profiles:['inf','math']}
+    {id:3,name:'A1-Майлина',branchId:2, curatorId:3, profiles:['inf','math']}
   ],
   students:[], attempts:[], audit:[], tests:[], questions:[],
   seq:{student:0,test:1,attempt:1,audit:1,group:4,admin:4,q:1}
